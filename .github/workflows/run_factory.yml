@@ -1,0 +1,580 @@
+# name: Content Factory Data Pipeline
+
+# on:
+#   schedule:
+#     - cron: '0 9,17 * * *'  # 9 AM & 5 PM UTC
+#   workflow_dispatch:         # Manual one-click trigger
+
+# jobs:
+#   prepare-data:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+
+#     steps:
+#       # 1. Checkout repo
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       # 2. Setup Python
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.10'
+
+#       # 3. Install dependencies
+#       - name: Install Dependencies
+#         run: pip install requests openai
+
+#       # 4. Process queue → generate pipeline_data.json
+#       - name: Process Queue & Generate Script
+#         env:
+#           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+#         run: |
+#           python3 << 'EOF'
+#           import os, json, re
+#           from datetime import datetime, timezone
+#           from openai import OpenAI
+          
+#           with open('reel_queue.json', 'r') as f:
+#               data = json.load(f)
+          
+#           queue = data.get('queue', [])
+#           processed = {p['url'] for p in data.get('processed', [])}
+          
+#           pick = None
+#           for r in queue:
+#               if r['url'] not in processed and 'instagram.com/reel/' in r['url']:
+#                   pick = r
+#                   break
+          
+#           if not pick:
+#               print("✅ No new reels. Exiting.")
+#               exit(0)
+          
+#           sc = re.search(r'/reel/([^/?]+)', pick['url']).group(1)
+#           user = pick.get('username', 'unknown')
+          
+#           client = OpenAI(api_key=os.environ['GROQ_API_KEY'], base_url='https://api.groq.com/openai/v1')
+#           resp = client.chat.completions.create(
+#               model="llama-3.3-70b-versatile",
+#               messages=[
+#                   {"role":"system","content":"YouTube Shorts expert. Max 35 words. Bold hook. One tip. CTA."},
+#                   {"role":"user","content":f"Write a 14s script inspired by @{user}"}
+#               ],
+#               max_tokens=100
+#           )
+#           script = resp.choices[0].message.content.strip()
+          
+#           with open('pipeline_data.json', 'w') as f:
+#               json.dump({
+#                   "reel_url": pick['url'], "shortcode": sc, "username": user,
+#                   "script_text": script,
+#                   "youtube_title": f"AI Hack #shorts",
+#                   "youtube_description": f"Tip from @{user}. #ai",
+#                   "youtube_tags": ["AI","Shorts"]
+#               }, f, indent=2)
+          
+#           data.setdefault('processed', []).append({
+#               "url": pick['url'], "username": user,
+#               "status": "in_progress", "started_at": datetime.now(timezone.utc).isoformat()
+#           })
+#           with open('reel_queue.json', 'w') as f:
+#               json.dump(data, f, indent=2)
+#           print(f"✅ Queued: {pick['url']}")
+#           EOF
+
+#       # 5. Commit & Push
+#       - name: Commit & Push Data
+#         run: |
+#           git config user.name "github-actions[bot]"
+#           git config user.email "github-actions[bot]@users.noreply.github.com"
+#           git add -f reel_queue.json pipeline_data.json
+#           git diff-index --quiet HEAD -- || git commit -m "Auto: queued reel [skip ci]" && git push || true
+#           echo "✅ Data committed. Kaggle will fetch via Raw URL within ≤15 mins."
+
+#       # 6. Final Status
+#       - name: Final Status
+#         run: |
+#           echo "========================================="
+#           echo "✅ ONE-CLICK AUTOMATION COMPLETE"
+#           echo "📁 pipeline_data.json committed to repo"
+#           echo "🔗 Kaggle fetches from: https://raw.githubusercontent.com/My-Memory-2008/content-factory-orchestrator/refs/heads/main/pipeline_data.json"
+#           echo "⏳ Kaggle scheduler runs every 15 mins (smart-check exits in 5s if no new data)"
+#           echo "🔗 Monitor Kaggle: https://www.kaggle.com/My-Memory-2008/content-factory-engine"
+#           echo "========================================="
+
+
+        
+# name: Content Factory Orchestrator
+
+# on:
+#   schedule:
+#     - cron: '0 9,17 * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   process-queue:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.10'
+
+#       - name: Install Dependencies
+#         run: pip install requests openai kaggle
+
+#       - name: Process Queue & Generate Script
+#         env:
+#           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+#         run: |
+#           python3 << 'PYTHON_EOF'
+#           import os, json, requests, re
+#           from datetime import datetime, timezone
+#           from openai import OpenAI
+
+#           print("🧠 Starting Queue Processor...")
+
+#           with open('reel_queue.json', 'r') as f:
+#               queue_data = json.load(f)
+
+#           queue = queue_data.get('queue', [])
+#           processed_urls = {item['url'] for item in queue_data.get('processed', [])}
+          
+#           print(f"📊 Queue Status: {len(queue)} in line, {len(processed_urls)} done.")
+
+#           next_reel = None
+#           for i, reel in enumerate(queue):
+#               url = reel.get('url', '').strip()
+#               if 'instagram.com/reel/' not in url:
+#                   continue
+#               if url in processed_urls:
+#                   print(f"⏭️ Skipped (Duplicate): {url}")
+#                   continue
+#               next_reel = reel
+#               print(f"🎯 SELECTED NEW REEL: {url}")
+#               break
+
+#           if not next_reel:
+#               print("✅ No new reels to process (or all duplicates). Exiting.")
+#               exit(0)
+
+#           match = re.search(r'/reel/([^/?]+)', next_reel['url'])
+#           shortcode = match.group(1) if match else "unknown"
+#           username = next_reel.get('username', 'unknown')
+
+#           print("🤖 Generating AI Script...")
+#           client = OpenAI(api_key=os.environ['GROQ_API_KEY'], base_url='https://api.groq.com/openai/v1')
+#           prompt = f"Write a 60-second YouTube Shorts script about the content from this reel by @{username}. Educational tone. Strong hook. #shorts"
+          
+#           response = client.chat.completions.create(
+#               model="llama-3.3-70b-versatile",
+#               messages=[
+#                   {"role": "system", "content": "You are an expert YouTube content creator."},
+#                   {"role": "user", "content": prompt}
+#               ],
+#               max_tokens=200,
+#               temperature=0.8
+#           )
+#           script = response.choices[0].message.content.strip()
+
+#           pipeline = {
+#               "reel_url": next_reel['url'],
+#               "shortcode": shortcode,
+#               "username": username,
+#               "script_text": script,
+#               "youtube_title": f"AI Tip You Need To Know #shorts",
+#               "youtube_description": f"Analysis of @{username}'s content. #ai #tech",
+#               "youtube_tags": ["AI", "Tech", "Shorts"]
+#           }
+
+#           with open('pipeline_data.json', 'w') as f:
+#               json.dump(pipeline, f, indent=2)
+
+#           entry = {
+#               "url": next_reel['url'],
+#               "username": username,
+#               "status": "in_progress",
+#               "started_at": datetime.now(timezone.utc).isoformat()
+#           }
+#           queue_data.setdefault('processed', []).append(entry)
+          
+#           with open('reel_queue.json', 'w') as f:
+#               json.dump(queue_data, f, indent=2)
+
+#           print("✅ Files ready for Kaggle trigger.")
+#           PYTHON_EOF
+
+#       - name: Commit Updates
+#         run: |
+#           git config user.name "github-actions[bot]"
+#           git config user.email "github-actions[bot]@users.noreply.github.com"
+#           git add -f reel_queue.json pipeline_data.json
+#           if git diff-index --quiet HEAD --; then
+#             echo "ℹ️ No changes to commit."
+#           else
+#             git commit -m "Auto: Picked next reel [skip ci]"
+#             git push
+#           fi
+
+#       # 🔥 THIS IS THE EXACT CODE YOU PROVIDED - WITH CRITICAL FIXES
+#       - name: Push and Run Kaggle Notebook
+#         env:
+#           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+#           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+#         run: |
+#           # Install CLI
+#           pip install kaggle
+          
+#           # Setup auth - USE printf TO AVOID ESCAPING ISSUES
+#           mkdir -p ~/.kaggle
+#           printf '{"username":"%s","key":"%s"}\n' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > ~/.kaggle/kaggle.json
+#           chmod 600 ~/.kaggle/kaggle.json
+          
+#           # DEBUG: Show what we're sending (sanitized)
+#           echo "🔐 Auth setup complete. Key length: ${#KAGGLE_KEY}"
+          
+#           # Push to Kaggle - PATH IS "." BECAUSE FILES ARE IN REPO ROOT
+#           echo "🚀 Pushing notebook to Kaggle from: $(pwd)"
+#           kaggle kernels push -p .
+          
+#           echo "✅ Pushed to Kaggle. If 'Run on push' is enabled, execution starts automatically."
+#           echo "🔗 Monitor: https://www.kaggle.com/muhammadasjad2008/content-factory-engine"
+
+# name: Content Factory Orchestrator (Duplicate-Proof)
+
+# on:
+#   schedule:
+#     - cron: '0 9,17 * * *'  # Runs at 9 AM & 5 PM UTC
+#   workflow_dispatch:         # Allows manual trigger
+
+# jobs:
+#   process-queue:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write        # Allows the bot to push files back to repo
+
+#     steps:
+#       # 1. Checkout your repository
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       # 2. Set up Python
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.10'
+
+#       # 3. Install lightweight dependencies
+#       - name: Install Dependencies
+#         run: pip install requests openai
+
+#       # 4. Run the Queue Logic (Checks Duplicates & Generates Script)
+#       - name: Process Queue & Generate Script
+#         env:
+#           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+#         run: |
+#           python3 << 'PYTHON_EOF'
+#           import os, json, requests, re
+#           from datetime import datetime, timezone
+#           from openai import OpenAI
+
+#           print("🧠 Starting Queue Processor...")
+
+#           # Load Queue
+#           with open('reel_queue.json', 'r') as f:
+#               queue_data = json.load(f)
+
+#           queue = queue_data.get('queue', [])
+#           # Build a set of already processed URLs for fast lookup
+#           processed_urls = {item['url'] for item in queue_data.get('processed', [])}
+          
+#           print(f"📊 Queue Status: {len(queue)} in line, {len(processed_urls)} done.")
+
+#           next_reel = None
+
+#           # Find first valid, unprocessed reel
+#           for i, reel in enumerate(queue):
+#               url = reel.get('url', '').strip()
+              
+#               # 1. Basic validation
+#               if 'instagram.com/reel/' not in url:
+#                   continue
+              
+#               # 2. DUPLICATE CHECK
+#               if url in processed_urls:
+#                   print(f"⏭️ Skipped (Duplicate): {url}")
+#                   continue
+              
+#               # If we get here, we found a fresh reel!
+#               next_reel = reel
+#               print(f"🎯 SELECTED NEW REEL: {url}")
+#               break
+
+#           if not next_reel:
+#               print("✅ No new reels to process (or all duplicates). Exiting.")
+#               exit(0)
+
+#           # Extract Shortcode for tracking
+#           match = re.search(r'/reel/([^/?]+)', next_reel['url'])
+#           shortcode = match.group(1) if match else "unknown"
+#           username = next_reel.get('username', 'unknown')
+
+#           # Generate Script via Groq
+#           print("🤖 Generating AI Script...")
+#           client = OpenAI(api_key=os.environ['GROQ_API_KEY'], base_url='https://api.groq.com/openai/v1')
+#           prompt = f"Write a 60-second YouTube Shorts script about the content from this reel by @{username}. Educational tone. Strong hook. #shorts"
+          
+#           response = client.chat.completions.create(
+#               model="llama-3.3-70b-versatile",
+#               messages=[
+#                   {"role": "system", "content": "You are an expert YouTube content creator."},
+#                   {"role": "user", "content": prompt}
+#               ],
+#               max_tokens=200,
+#               temperature=0.8
+#           )
+#           script = response.choices[0].message.content.strip()
+
+#           # Create pipeline_data.json (The instruction file for Kaggle)
+#           pipeline = {
+#               "reel_url": next_reel['url'],
+#               "shortcode": shortcode,
+#               "username": username,
+#               "script_text": script,
+#               "youtube_title": f"AI Tip You Need To Know #shorts",
+#               "youtube_description": f"Analysis of @{username}'s content. #ai #tech",
+#               "youtube_tags": ["AI", "Tech", "Shorts"]
+#           }
+
+#           with open('pipeline_data.json', 'w') as f:
+#               json.dump(pipeline, f, indent=2)
+
+#           # Mark as "in_progress" in Queue to prevent race conditions
+#           entry = {
+#               "url": next_reel['url'],
+#               "username": username,
+#               "status": "in_progress",
+#               "started_at": datetime.now(timezone.utc).isoformat()
+#           }
+#           queue_data.setdefault('processed', []).append(entry)
+          
+#           with open('reel_queue.json', 'w') as f:
+#               json.dump(queue_data, f, indent=2)
+
+#           print("✅ Files ready for Kaggle trigger.")
+#           PYTHON_EOF
+
+#       # 5. Commit changes back to GitHub
+#       - name: Commit Updates
+#         run: |
+#           git config user.name "github-actions[bot]"
+#           git config user.email "github-actions[bot]@users.noreply.github.com"
+#           git add -f reel_queue.json pipeline_data.json
+#           if git diff-index --quiet HEAD --; then
+#             echo "ℹ️ No changes to commit."
+#           else
+#             git commit -m "Auto: Picked next reel [skip ci]"
+#             git push
+#           fi
+
+#       # 6. Trigger Kaggle (Using Kaggle CLI)
+#       - name: Trigger Kaggle Notebook
+#         env:
+#           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+#           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+#         run: python3 trigger.py
+
+
+
+# name: Content Factory Orchestrator (GitHub Sync + API Trigger)
+
+# on:
+#   schedule:
+#     - cron: '0 9,17 * * *'
+#   workflow_dispatch:
+
+# jobs:
+#   automate:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.10'
+
+#       # FIX: Installs packages directly into the active Toolcache environment
+#       - name: Install Dependencies
+#         run: python3 -m pip install --upgrade pip requests openai kaggle
+
+#       - name: Process Queue
+#         env:
+#           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+#         run: python3 -c "import os, json, re; from datetime import datetime, timezone; from openai import OpenAI; data = {'queue':[], 'processed':[]}; (data.update(json.load(open('reel_queue.json'))) if os.path.exists('reel_queue.json') else None); pick = next((r for r in data.get('queue', []) if r.get('url') not in {p.get('url') for p in data.get('processed', [])} and '://instagram.com' in r.get('url', '')), None); (print('No reels found') or exit(0)) if not pick else None; sc = re.search(r'/reel/([^/?]+)', pick['url']).group(1); user = pick.get('username', 'unknown'); client = OpenAI(api_key=os.environ['GROQ_API_KEY'], base_url='https://groq.com'); resp = client.chat.completions.create(model='llama-3.3-70b-versatile', messages=[{'role':'system','content':'Shorts expert. Max 35 words.'},{'role':'user','content':f'Write a script for @{user}'}]); script = resp.choices.message.content.strip().replace('EOF',''); json.dump({'reel_url':pick['url'], 'shortcode':sc, 'username':user, 'script_text':script, 'youtube_title':'AI Short', 'youtube_description':'#ai', 'youtube_tags':['AI']}, open('pipeline_data.json', 'w'), indent=2); data.setdefault('processed', []).append({'url':pick['url'], 'username':user, 'status':'in_progress', 'started_at':datetime.now(timezone.utc).isoformat()}); json.dump(data, open('reel_queue.json', 'w'), indent=2); print('✅ Staged.')"
+
+#       - name: Commit Data Changes
+#         run: git config --global user.name "github-actions[bot]" && git config --global user.email "github-actions[bot]@://github.com" && git add reel_queue.json pipeline_data.json && git commit -m "Auto queued reel [skip ci]" || true
+
+#       - name: Push Data Changes
+#         run: git push || true
+
+#       - name: Trigger Kaggle GPU Notebook Execution
+#         env:
+#           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+#           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+#         run: python3 trigger.py
+
+
+
+name: Content Factory Orchestrator (Duplicate-Proof)
+
+on:
+  schedule:
+    - cron: '30 3,11 * * *'  # Runs at 9 AM & 5 PM UTC
+  workflow_dispatch:         # Allows manual trigger
+
+jobs:
+  process-queue:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # Allows the bot to push files back to repo
+
+    steps:
+      # 1. Checkout your repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # 3. Install lightweight dependencies
+      - name: Install Dependencies
+        run: |
+         pip install requests openai
+         python -m pip install --upgrade pip
+         pip install playwright
+         playwright install chromium --with-deps
+         
+
+      # 4. Run the Queue Logic (Checks Duplicates & Generates Script)
+      #4. Process queue → generate pipeline_data.json
+      - name: Process Queue & Generate Script
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python3 << 'EOF'
+          import os, json, re
+          from datetime import datetime, timezone
+          from openai import OpenAI
+          
+          with open('reel_queue.json', 'r') as f:
+              data = json.load(f)
+          
+          queue = data.get('queue', [])
+          processed = {p['url'] for p in data.get('processed', [])}
+          
+          pick = None
+          for r in queue:
+              if 'instagram.com/' in r['url']:
+                  pick = r
+                  break
+          
+          if not pick:
+              print("✅ No new reels. Exiting.")
+              exit(0)
+
+          #
+          # sc = re.search(r'/reel/([^/?]+)', pick['url']).group(1)
+          #
+          
+          sc_match = re.search(r'/reel/([^/?]+)', pick['url'])
+          sc = sc_match.group(1) if sc_match else "unknown"
+          user = pick.get('username', 'unknown')
+          
+          client = OpenAI(api_key=os.environ['GROQ_API_KEY'], base_url='https://api.groq.com/openai/v1')
+          resp = client.chat.completions.create(
+              model="llama-3.3-70b-versatile",
+              messages=[
+                  {"role":"system","content":"YouTube Shorts expert. Max 35 words. Bold hook. One tip. CTA."},
+                  {"role":"user","content":f"Write a 14s script inspired by @{user}"}
+              ],
+              max_tokens=100
+          )
+          script = resp.choices[0].message.content.strip()
+          
+          with open('pipeline_data.json', 'w') as f:
+              json.dump({
+                  "reel_url": pick['url'], "shortcode": sc, "username": user,
+                  "script_text": " ",
+                  "youtube_title": f"AI Hack #shorts",
+                  "youtube_description": f"Tip from @{user}. #ai",
+                  "youtube_tags": ["AI","Shorts"]
+              }, f, indent=2)
+          
+          data.setdefault('processed', []).append({
+              "url": pick['url'], "username": user,
+              "status": "in_progress", "started_at": datetime.now(timezone.utc).isoformat()
+          })
+          with open('reel_queue.json', 'w') as f:
+              json.dump(data, f, indent=2)
+          print(f"✅ Queued: {pick['url']}")
+          EOF
+
+      # 5. Commit changes back to GitHub
+      - name: Commit Updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f reel_queue.json pipeline_data.json
+          if git diff-index --quiet HEAD --; then
+            echo "ℹ️ No changes to commit."
+          else
+            git commit -m "Auto: Picked next reel [skip ci]"
+            git push
+          fi
+
+       # 6. Trigger Kaggle (Using Kaggle CLI)
+      - name: Trigger Kaggle Notebook
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_AUTH_JSON: ${{ secrets.KAGGLE_AUTH_JSON }}
+        run: python3 trigger.py
+
+      # - name: Execute Kaggle T4x2 Push Trigger
+      #   # 🔥 THE CRITICAL ENVIRONMENT BRIDGE:
+      #   # This explicitly passes your encrypted secrets into the runtime container
+      #   # so that Playwright can read your session cookie!
+      #   env:
+      #     KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+      #     KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+      #     KAGGLE_WEB_COOKIE: ${{ secrets.KAGGLE_WEB_COOKIE }}
+      #     KAGGLE_COOKIE: ${{secrets.KAGGLE_COOKIE}}
+      #   run: |
+      #     python trigger.py
+
+
+      #   # Always upload screenshots — even on success — so you can always see what happened
+      # - name: Upload debug screenshots
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: debug-screenshots
+      #     path: "*.png"
+      #     if-no-files-found: ignore
