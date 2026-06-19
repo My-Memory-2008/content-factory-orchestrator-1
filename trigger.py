@@ -290,7 +290,7 @@ async def run():
         page = await context.new_page()
 
         # Exact path of your script editor panel
-        notebook_url = "https://kaggle.com/code/muhammadasjad2008/content-factory-engine1/edit"
+        notebook_url = "https://kaggle.com/code/muhammadasjad2008/content-factory-engine-1/edit"
         print(f"📡 Connecting to script workspace: {notebook_url}")
         
         try:
