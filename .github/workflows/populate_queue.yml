@@ -70,21 +70,28 @@ jobs:
               "added_at": datetime.now(timezone.utc).isoformat()
           }
 
-          # Load or create reel_queue.json
-          if os.path.exists(QUEUE_FILE):
-              with open(QUEUE_FILE, "r") as f:
-                  queue_data = json.load(f)
-          else:
-              queue_data = {
-                  "queue": [],
-                  "processed": [],
-                  "metadata": {
-                      "total_queued": 0,
-                      "total_processed": 0,
-                      "last_run": None,
-                      "next_scheduled": None
-                  }
+          # Default structure if file is missing or empty
+          default_queue_data = {
+              "queue": [],
+              "processed": [],
+              "metadata": {
+                  "total_queued": 0,
+                  "total_processed": 0,
+                  "last_run": None,
+                  "next_scheduled": None
               }
+          }
+
+          # Load or create reel_queue.json
+          if os.path.exists(QUEUE_FILE) and os.path.getsize(QUEUE_FILE) > 0:
+              with open(QUEUE_FILE, "r") as f:
+                  try:
+                      queue_data = json.load(f)
+                  except json.JSONDecodeError:
+                      print(f"⚠️ {QUEUE_FILE} contained invalid JSON. Resetting to default structure.")
+                      queue_data = default_queue_data
+          else:
+              queue_data = default_queue_data
 
           # Replace queue with new entry (or append if you prefer)
           queue_data["queue"] = [entry]  # Replace with single entry
