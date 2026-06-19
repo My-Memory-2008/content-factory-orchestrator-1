@@ -478,13 +478,13 @@ jobs:
       # 4. Run the Queue Logic (Checks Duplicates & Generates Script)
       #4. Process queue → generate pipeline_data.json
       - name: Process Queue & Generate Script
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        #env:
+          # GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           python3 << 'EOF'
           import os, json, re
           from datetime import datetime, timezone
-          from openai import OpenAI
+          # from openai import OpenAI
           
           with open('reel_queue.json', 'r') as f:
               data = json.load(f)
@@ -510,33 +510,33 @@ jobs:
           sc = sc_match.group(1) if sc_match else "unknown"
           user = pick.get('username', 'unknown')
           
-          client = OpenAI(api_key=os.environ['GROQ_API_KEY'], base_url='https://api.groq.com/openai/v1')
-          resp = client.chat.completions.create(
-              model="llama-3.3-70b-versatile",
-              messages=[
-                  {"role":"system","content":"YouTube Shorts expert. Max 35 words. Bold hook. One tip. CTA."},
-                  {"role":"user","content":f"Write a 14s script inspired by @{user}"}
-              ],
-              max_tokens=100
-          )
-          script = resp.choices[0].message.content.strip()
+          # client = OpenAI(api_key=os.environ['GROQ_API_KEY'], base_url='https://api.groq.com/openai/v1')
+          # resp = client.chat.completions.create(
+          #    model="llama-3.3-70b-versatile",
+          #    messages=[
+          #        {"role":"system","content":"YouTube Shorts expert. Max 35 words. Bold hook. One tip. CTA."},
+          #        {"role":"user","content":f"Write a 14s script inspired by @{user}"}
+          #   ],
+          #    max_tokens=100
+          #)
+          # script = resp.choices[0].message.content.strip()
           
-          with open('pipeline_data.json', 'w') as f:
-              json.dump({
-                  "reel_url": pick['url'], "shortcode": sc, "username": user,
-                  "script_text": " ",
-                  "youtube_title": f"AI Hack #shorts",
-                  "youtube_description": f"Tip from @{user}. #ai",
-                  "youtube_tags": ["AI","Shorts"]
-              }, f, indent=2)
+          # with open('pipeline_data.json', 'w') as f:
+          #   json.dump({
+          #        "reel_url": pick['url'], "shortcode": sc, "username": user,
+          #        "script_text": " ",
+              #     "youtube_title": f"AI Hack #shorts",
+              #     "youtube_description": f"Tip from @{user}. #ai",
+              #     "youtube_tags": ["AI","Shorts"]
+              # }, f, indent=2)
           
-          data.setdefault('processed', []).append({
-              "url": pick['url'], "username": user,
-              "status": "in_progress", "started_at": datetime.now(timezone.utc).isoformat()
-          })
-          with open('reel_queue.json', 'w') as f:
-              json.dump(data, f, indent=2)
-          print(f"✅ Queued: {pick['url']}")
+          # data.setdefault('processed', []).append({
+          #     "url": pick['url'], "username": user,
+          #     "status": "in_progress", "started_at": datetime.now(timezone.utc).isoformat()
+          # })
+          # with open('reel_queue.json', 'w') as f:
+          #     json.dump(data, f, indent=2)
+          # print(f"✅ Queued: {pick['url']}")
           EOF
 
       # 5. Commit changes back to GitHub
