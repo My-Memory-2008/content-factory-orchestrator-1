@@ -1,1 +1,17 @@
-
+{
+  "queue": [
+    {
+      "url": "https://www.instagram.com/reel/DYq_QoASFOF/",
+      "username": "reel",
+      "notes": "Auto-added from reels_source.txt",
+      "added_at": "2026-06-19T16:16:05.399394+00:00"
+    }
+  ],
+  "processed": [],
+  "metadata": {
+    "total_queued": 1,
+    "total_processed": 0,
+    "last_run": "2026-06-19T16:16:05.399485+00:00",
+    "next_scheduled": null
+  }
+}
