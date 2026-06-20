@@ -7,7 +7,14 @@
       "added_at": "2026-06-19T16:16:05.399394+00:00"
     }
   ],
-  "processed": [],
+  "processed": [
+    {
+      "url": "https://www.instagram.com/reel/DYq_QoASFOF/",
+      "username": "reel",
+      "status": "in_progress",
+      "started_at": "2026-06-20T03:50:02.387060+00:00"
+    }
+  ],
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
