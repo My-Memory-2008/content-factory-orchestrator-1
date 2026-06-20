@@ -1,1 +1,17 @@
-
+{
+  "queue": [
+    {
+      "url": "https://www.instagram.com/the_cinnamom/reel/DRtmGtMj_Gd/",
+      "username": "the_cinnamom",
+      "notes": "Auto-added from reels_source.txt",
+      "added_at": "2026-06-20T11:50:59.227226+00:00"
+    }
+  ],
+  "processed": [],
+  "metadata": {
+    "total_queued": 1,
+    "total_processed": 0,
+    "last_run": "2026-06-20T11:50:59.227306+00:00",
+    "next_scheduled": null
+  }
+}
