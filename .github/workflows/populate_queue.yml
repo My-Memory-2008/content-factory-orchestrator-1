@@ -2,8 +2,8 @@ name: Populate reel_queue.json from TXT
 
 on:
   schedule:
-    # 00:30 UTC (6:00 AM IST) and 11:30 UTC (5:00 PM IST) every day
-    - cron: '30 0,11 * * *'
+    - cron: '0 6,17 * * *'
+      timezone: 'Asia/Kolkata' # This runs at exactly 6:00 AM IST
   workflow_dispatch:         # Manual trigger
 
 jobs:
