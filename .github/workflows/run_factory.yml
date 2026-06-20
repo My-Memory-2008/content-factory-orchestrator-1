@@ -521,22 +521,22 @@ jobs:
           #)
           # script = resp.choices[0].message.content.strip()
           
-          # with open('pipeline_data.json', 'w') as f:
-          #   json.dump({
-          #        "reel_url": pick['url'], "shortcode": sc, "username": user,
-          #        "script_text": " ",
-              #     "youtube_title": f"AI Hack #shorts",
-              #     "youtube_description": f"Tip from @{user}. #ai",
-              #     "youtube_tags": ["AI","Shorts"]
-              # }, f, indent=2)
+          with open('pipeline_data.json', 'w') as f:
+            json.dump({
+                 "reel_url": pick['url'], "shortcode": sc, "username": user,
+                 "script_text": " ",
+                  "youtube_title": f"AI Hack #shorts",
+                  "youtube_description": f"Tip from @{user}. #ai",
+                  "youtube_tags": ["AI","Shorts"]
+              }, f, indent=2)
           
-          # data.setdefault('processed', []).append({
-          #     "url": pick['url'], "username": user,
-          #     "status": "in_progress", "started_at": datetime.now(timezone.utc).isoformat()
-          # })
-          # with open('reel_queue.json', 'w') as f:
-          #     json.dump(data, f, indent=2)
-          # print(f"✅ Queued: {pick['url']}")
+          data.setdefault('processed', []).append({
+              "url": pick['url'], "username": user,
+              "status": "in_progress", "started_at": datetime.now(timezone.utc).isoformat()
+          })
+          with open('reel_queue.json', 'w') as f:
+              json.dump(data, f, indent=2)
+          print(f"✅ Queued: {pick['url']}")
           EOF
 
       # 5. Commit changes back to GitHub
