@@ -1,6 +1,9 @@
 name: 30-Min Multi-Workflow Checker
 
 on:
+  repository_dispatch:
+    types: [trigger-my-job] # You can name this event anything you like
+
   workflow_dispatch:
 
 jobs:
