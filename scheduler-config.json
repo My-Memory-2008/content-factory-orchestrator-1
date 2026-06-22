@@ -7,7 +7,7 @@
     "branch": "main"
   },
   {
-    "target_time_ist": "13:00",
+    "target_time_ist": "12:39",
     "workflow_file": "run_factory.yml",
     "repo_owner": "My-Memory-2008",
     "repo_name": "content-factory-orchestrator-1",
