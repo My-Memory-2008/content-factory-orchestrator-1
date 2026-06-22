@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/haleza.food/reel/DSaRW_vil7c/",
-      "username": "haleza.food",
+      "url": "https://www.instagram.com/dubaichocolateusa/reel/DQJmW3ajiQA/",
+      "username": "dubaichocolateusa",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-06-21T13:20:57.869961+00:00"
+      "added_at": "2026-06-22T00:19:56.708341+00:00"
     }
   ],
   "processed": [
@@ -30,7 +30,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-06-21T13:20:57.870061+00:00",
+    "last_run": "2026-06-22T00:19:56.708438+00:00",
     "next_scheduled": null
   }
 }
