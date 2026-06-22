@@ -1,34 +1,34 @@
 const { test, expect } = require('@playwright/test');
-const fs = require('fs');
-const path = require('path');
 
-test('Trigger Target GitHub Workflow via API Configuration', async ({ request }) => {
-  // Read and parse the local JSON file
-  const configPath = path.join(__dirname, '../scheduler-config.json');
-  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+test('Trigger Target GitHub Workflow via Dynamic API Configuration', async ({ request }) => {
+  // Read details passed dynamically from the loop environment
+  const OWNER = process.env.RUN_OWNER;
+  const REPO = process.env.RUN_REPO;
+  const WORKFLOW_FILE = process.env.RUN_WORKFLOW;
+  const BRANCH = process.env.RUN_BRANCH;
 
-  console.log(`Preparing API request for repo: ${config.repo_owner}/${config.repo_name}`);
-  console.log(`Targeting workflow file: ${config.workflow_file}`);
+  console.log(`Sending API request to: ${OWNER}/${REPO}`);
+  console.log(`Executing workflow file: ${WORKFLOW_FILE} on branch: ${BRANCH}`);
 
   const response = await request.post(
-    `https://github.com{config.repo_owner}/${config.repo_name}/actions/workflows/${config.workflow_file}/dispatches`,
+    `https://github.com{OWNER}/${REPO}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
     {
       headers: {
         'Accept': 'application/vnd.github+json',
-        'Authorization': `Bearer ${process.env.GH_TOKEN}`, // This system token remains required for GitHub authorization
+        'Authorization': `Bearer ${process.env.GH_TOKEN}`,
         'X-GitHub-Api-Version': '2022-11-28',
       },
       data: {
-        ref: config.branch, 
+        ref: BRANCH,
       },
     }
   );
 
   if (response.status() === 204) {
-    console.log(`Success! GitHub has started executing ${config.workflow_file}`);
+    console.log(`Success! Started execution for ${WORKFLOW_FILE}`);
   } else {
     const errorBody = await response.text();
-    console.error(`Failed to trigger workflow. Status: ${response.status()}`);
+    console.error(`Failed to trigger ${WORKFLOW_FILE}. Status: ${response.status()}`);
     console.error(`Response details: ${errorBody}`);
   }
 
