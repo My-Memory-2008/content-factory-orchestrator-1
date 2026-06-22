@@ -1,0 +1,83 @@
+name: 30-Min Multi-Workflow Checker
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-and-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      - name: Process Multi-Workflow Schedule from JSON
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node -e "
+          const { execSync } = require('child_process');
+          const fs = require('fs');
+          
+          // 1. Get current time formatted to India Zone (IST)
+          const now = new Date();
+          const indiaTimeStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
+          const indiaDate = new Date(indiaTimeStr);
+          
+          const currentHour = String(indiaDate.getHours()).padStart(2, '0');
+          const currentMinute = String(indiaDate.getMinutes()).padStart(2, '0');
+          const currentTimeIST = \`\${currentHour}:\${currentMinute}\`;
+          
+          console.log(\`Current System Time in India (IST): \${currentTimeIST}\n\`);
+
+          const [currH, currM] = currentTimeIST.split(':').map(Number);
+          const currTotalMinutes = currH * 60 + currM;
+
+          // 2. Load the multi-task JSON array
+          const tasks = JSON.parse(fs.readFileSync('scheduler-config.json', 'utf8'));
+          
+          // 3. Loop through each configuration item
+          tasks.forEach(task => {
+            const [targetH, targetM] = task.target_time_ist.split(':').map(Number);
+            const targetTotalMinutes = targetH * 60 + targetM;
+            
+            const timeDifference = currTotalMinutes - targetTotalMinutes;
+            
+            console.log(\`Checking task: \${task.workflow_file} (Target IST: \${task.target_time_ist})\`);
+            
+            // Check if this specific task falls inside the current execution window
+            if (timeDifference >= 0 && timeDifference < 30) {
+              console.log(\`-> Matches window! Launching Playwright for \${task.workflow_file}...\`);
+              try {
+                // Pass individual task details to Playwright via process environment variables
+                execSync('npx playwright test tests/trigger-workflow.spec.js', {
+                  stdio: 'inherit',
+                  env: {
+                    ...process.env,
+                    RUN_OWNER: task.repo_owner,
+                    RUN_REPO: task.repo_name,
+                    RUN_WORKFLOW: task.workflow_file,
+                    RUN_BRANCH: task.branch
+                  }
+                });
+              } catch (error) {
+                console.error(\`-> Playwright execution failed for \${task.workflow_file}\`);
+              }
+            } else {
+              console.log('-> Not time yet. Skipped.');
+            }
+            console.log('--------------------------------------------------');
+          });
+          "
