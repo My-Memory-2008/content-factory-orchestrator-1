@@ -1,16 +1,16 @@
 [
   {
     "target_time_ist": "09:00",
-    "workflow_file": "morning-cleanup.yml",
-    "repo_owner": "your-github-username",
-    "repo_name": "your-repo-name",
+    "workflow_file": "populate_queue.yml",
+    "repo_owner": "My-Memory-2008",
+    "repo_name": "content-factory-orchestrator-1",
     "branch": "main"
   },
   {
-    "target_time_ist": "14:30",
-    "workflow_file": "main-task.yml",
-    "repo_owner": "your-github-username",
-    "repo_name": "your-repo-name",
+    "target_time_ist": "13:00",
+    "workflow_file": "run_factory.yml",
+    "repo_owner": "My-Memory-2008",
+    "repo_name": "content-factory-orchestrator-1",
     "branch": "main"
   }
 ]
