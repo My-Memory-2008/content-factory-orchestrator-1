@@ -442,9 +442,6 @@
 name: Content Factory Orchestrator (Duplicate-Proof)
 
 on:
-  schedule:
-     - cron: '17 6,17 * * *'
-       timezone: 'Asia/Kolkata' # This runs at exactly 7:00 AM and 6:00PM IST
   workflow_dispatch:         # Allows manual trigger
 
 jobs:
