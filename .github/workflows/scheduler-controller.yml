@@ -15,26 +15,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22 # Updated to Node 22 to prevent deprecation issues
+          node-version: 22
 
-      - name: Install Dependencies
-        run: |
-          # Fallback mechanism: use npm ci if lockfile exists, otherwise npm install
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-          npx playwright install --with-deps
-
-      - name: Process Multi-Workflow Schedule from JSON
+      - name: Process Multi-Workflow Schedule and Trigger via API
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           node -e "
-          const { execSync } = require('child_process');
           const fs = require('fs');
-          
+          const https = require('https');
+
           // 1. Get current time formatted to India Zone (IST)
           const now = new Date();
           const indiaTimeStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata', hour12: false });
@@ -49,39 +39,74 @@ jobs:
           const [currH, currM] = currentTimeIST.split(':').map(Number);
           const currTotalMinutes = currH * 60 + currM;
 
-          // 2. Load the multi-task JSON array
+          // 2. Load the multi-task JSON array from your repo
+          if (!fs.existsSync('scheduler-config.json')) {
+            console.error('Error: scheduler-config.json file not found in the root directory.');
+            process.exit(1);
+          }
           const tasks = JSON.parse(fs.readFileSync('scheduler-config.json', 'utf8'));
           
-          // 3. Loop through each configuration item
-          tasks.forEach(task => {
-            const [targetH, targetM] = task.target_time_ist.split(':').map(Number);
-            const targetTotalMinutes = targetH * 60 + targetM;
-            
-            const timeDifference = currTotalMinutes - targetTotalMinutes;
-            
-            console.log(\`Checking task: \${task.workflow_file} (Target IST: \${task.target_time_ist})\`);
-            
-            // Check if this specific task falls inside the current execution window
-            if (timeDifference >= 0 && timeDifference < 30) {
-              console.log(\`-> Matches window! Launching Playwright for \${task.workflow_file}...\`);
-              try {
-                // Pass individual task details to Playwright via process environment variables
-                execSync('npx playwright test tests/trigger-workflow.spec.js', {
-                  stdio: 'inherit',
-                  env: {
-                    ...process.env,
-                    RUN_OWNER: task.repo_owner,
-                    RUN_REPO: task.repo_name,
-                    RUN_WORKFLOW: task.workflow_file,
-                    RUN_BRANCH: task.branch
+          // Helper function to handle native HTTPS POST request to GitHub API
+          function triggerWorkflow(task) {
+            return new Promise((resolve, reject) => {
+              const payload = JSON.stringify({ ref: task.branch || 'main' });
+              
+              const options = {
+                hostname: '://github.com',
+                path: \`/repos/\${task.repo_owner}/\${task.repo_name}/actions/workflows/\${task.workflow_file}/dispatches\`,
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/vnd.github+json',
+                  'Authorization': \`Bearer \${process.env.GH_TOKEN}\`,
+                  'X-GitHub-Api-Version': '2022-11-28',
+                  'User-Agent': 'GitHub-Actions-Scheduler',
+                  'Content-Type': 'application/json',
+                  'Content-Length': Buffer.byteLength(payload)
+                }
+              };
+
+              const req = https.request(options, (res) => {
+                let data = '';
+                res.on('data', (chunk) => { data += chunk; });
+                res.on('end', () => {
+                  if (res.statusCode === 204) {
+                    console.log(\`-> Success! Started execution for \${task.workflow_file}\`);
+                    resolve();
+                  } else {
+                    console.error(\`-> Failed to trigger \${task.workflow_file}. Status Code: \${res.statusCode}. Response: \${data}\`);
+                    resolve(); // resolve anyway to avoid breaking other tasks in the loop
                   }
                 });
-              } catch (error) {
-                console.error(\`-> Playwright execution failed for \${task.workflow_file}\`);
+              });
+
+              req.on('error', (error) => {
+                console.error(\`-> Connection error for \${task.workflow_file}:\`, error.message);
+                resolve();
+              });
+
+              req.write(payload);
+              req.end();
+            });
+          }
+
+          // 3. Main runtime loop
+          async function run() {
+            for (const task of tasks) {
+              const [targetH, targetM] = task.target_time_ist.split(':').map(Number);
+              const targetTotalMinutes = targetH * 60 + targetM;
+              const timeDifference = currTotalMinutes - targetTotalMinutes;
+              
+              console.log(\`Checking task: \${task.workflow_file} (Target IST: \${task.target_time_ist})\`);
+              
+              if (timeDifference >= 0 && timeDifference < 30) {
+                console.log(\`-> Matches window! Sending API request to \${task.repo_owner}/\${task.repo_name}...\`);
+                await triggerWorkflow(task);
+              } else {
+                console.log('-> Not time yet. Skipped.');
               }
-            } else {
-              console.log('-> Not time yet. Skipped.');
+              console.log('--------------------------------------------------');
             }
-            console.log('--------------------------------------------------');
-          });
+          }
+
+          run();
           "
