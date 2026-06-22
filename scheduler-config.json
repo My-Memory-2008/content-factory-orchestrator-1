@@ -1,0 +1,7 @@
+{
+  "target_time_ist": "14:30",
+  "workflow_file": "main-task.yml",
+  "repo_owner": "your-github-username",
+  "repo_name": "your-repo-name",
+  "branch": "main"
+}
