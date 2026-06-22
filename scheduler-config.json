@@ -1,7 +1,16 @@
-{
-  "target_time_ist": "14:30",
-  "workflow_file": "main-task.yml",
-  "repo_owner": "your-github-username",
-  "repo_name": "your-repo-name",
-  "branch": "main"
-}
+[
+  {
+    "target_time_ist": "09:00",
+    "workflow_file": "morning-cleanup.yml",
+    "repo_owner": "your-github-username",
+    "repo_name": "your-repo-name",
+    "branch": "main"
+  },
+  {
+    "target_time_ist": "14:30",
+    "workflow_file": "main-task.yml",
+    "repo_owner": "your-github-username",
+    "repo_name": "your-repo-name",
+    "branch": "main"
+  }
+]
