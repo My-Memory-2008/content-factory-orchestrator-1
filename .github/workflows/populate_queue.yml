@@ -1,8 +1,6 @@
 name: Populate reel_queue.json from TXT
 
 on:
-  repository_dispatch:
-    types: [external-trigger]
   workflow_dispatch:         # Manual trigger
 
 jobs:
