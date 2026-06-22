@@ -1,13 +1,13 @@
 [
   {
-    "target_time_ist": "09:00",
+    "target_time_ist": "15:45",
     "workflow_file": "populate_queue.yml",
     "repo_owner": "My-Memory-2008",
     "repo_name": "content-factory-orchestrator-1",
     "branch": "main"
   },
   {
-    "target_time_ist": "14:55",
+    "target_time_ist": "15:55",
     "workflow_file": "run_factory.yml",
     "repo_owner": "My-Memory-2008",
     "repo_name": "content-factory-orchestrator-1",
