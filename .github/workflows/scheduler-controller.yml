@@ -3,7 +3,7 @@ name: 30-Min Multi-Workflow Checker
 on:
   schedule:
     - cron: '*/5 * * * *' 
-# Triggers the workflow every 5 minutes
+# Trigger workflow every 5 minutes
   workflow_dispatch:
 
 jobs:
