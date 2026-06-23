@@ -22,7 +22,7 @@ jobs:
           # Paste the raw content of your kaggle.json into GitHub Secrets under KAGGLE_JSON_SECRET
           KAGGLE_SECRET_DATA: ${{ secrets.KAGGLE_AUTH_JSON }}
           # The exact username and notebook URL slug (e.g., "username/notebook-title")
-          KAGGLE_SLUG: "your-kaggle-username/your-notebook-slug"
+          KAGGLE_SLUG: "https://www.kaggle.com/code/muhammadasjad2008/scheduler-1/edit"
         run: |
           node -e "
           const https = require('https');
