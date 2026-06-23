@@ -17,69 +17,10 @@ jobs:
         with:
           node-version: 22
 
-      - name: Run Kaggle API Version Commitment
+      - name: Trigger Kaggle Notebook
         env:
-          # Paste the raw content of your kaggle.json into GitHub Secrets under KAGGLE_JSON_SECRET
-          KAGGLE_SECRET_DATA: ${{ secrets.KAGGLE_AUTH_JSON }}
-          # The exact username and notebook URL slug (e.g., "username/notebook-title")
-          KAGGLE_SLUG: "https://www.kaggle.com/code/muhammadasjad2008/scheduler-1/edit"
-        run: |
-          node -e "
-          const https = require('https');
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_AUTH_JSON: ${{ secrets.KAGGLE_AUTH_JSON }}
+        run: python3 trigger-scheduler.py
 
-          async function run() {
-            // 1. Parse your kaggle.json credentials from the secret string
-            const config = JSON.parse(process.env.KAGGLE_SECRET_DATA);
-            const auth = Buffer.from(\`\${config.username}:\${config.key}\`).toString('base64');
-            
-            console.log(\`Authenticated as: \${config.username}\`);
-            console.log(\`Targeting Kaggle notebook: \${process.env.KAGGLE_SLUG}\`);
-
-            // 2. Build the API payload to trigger a complete background 'Save & Run All (Commit)'
-            const payload = JSON.stringify({
-              id: process.env.KAGGLE_SLUG,
-              isPrivate: true,
-              enableGpu: false,
-              enableTpu: false,
-              language: 'python',
-              kernelType: 'notebook',
-              code: '# Triggered dynamically\n' // Re-saving triggers a fresh rerun
-            });
-
-            const options = {
-              hostname: 'www.kaggle.com',
-              path: \`/api/v1/kernels/push\`,
-              method: 'POST',
-              headers: {
-                'Authorization': \`Basic \${auth}\`,
-                'Content-Type': 'application/json',
-                'User-Agent': 'GitHub-Actions-Orchestrator'
-              }
-            };
-
-            console.log('Sending API token execution to Kaggle server nodes...');
-            const req = https.request(options, (res) => {
-              let body = '';
-              res.on('data', (chunk) => body += chunk);
-              res.on('end', () => {
-                if (res.statusCode === 200) {
-                  console.log('Success! Kaggle has accepted the API push.');
-                  console.log('A fresh 7-hour background container instance is now compiling.');
-                } else {
-                  console.error(\`Failed to launch notebook. Status: \${res.statusCode}. Details: \${body}\`);
-                  process.exit(1);
-                }
-              });
-            });
-
-            req.on('error', (e) => {
-              console.error('Connection interrupted:', e.message);
-              process.exit(1);
-            });
-
-            req.write(payload);
-            req.end();
-          }
-
-          run();
-          "
