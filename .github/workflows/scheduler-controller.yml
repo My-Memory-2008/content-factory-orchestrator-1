@@ -1,8 +1,7 @@
 name: Refresh Kaggle Loop via API
 
 on:
-  repository_dispatch:
-    types: [refresh_kaggle_loop] # Triggered automatically by the Kaggle Python script
+  
   workflow_dispatch: # Manual button to start the loop the first time
 
 jobs:
