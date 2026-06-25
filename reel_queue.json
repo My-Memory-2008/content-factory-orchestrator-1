@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/ahfood12/reel/DP1GFN-iQLv/",
-      "username": "ahfood12",
+      "url": "https://www.instagram.com/choco_magic007/reel/DWed8LJDWWy/",
+      "username": "choco_magic007",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-06-25T10:39:39.890102+00:00"
+      "added_at": "2026-06-25T10:42:30.092208+00:00"
     }
   ],
   "processed": [
@@ -54,7 +54,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-06-25T10:39:39.890183+00:00",
+    "last_run": "2026-06-25T10:42:30.092295+00:00",
     "next_scheduled": null
   }
 }
