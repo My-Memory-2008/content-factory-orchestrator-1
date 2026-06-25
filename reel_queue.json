@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/dubaichocolateusa/reel/DQJmW3ajiQA/",
-      "username": "dubaichocolateusa",
+      "url": "https://www.instagram.com/ahfood12/reel/DP1GFN-iQLv/",
+      "username": "ahfood12",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-06-22T00:19:56.708341+00:00"
+      "added_at": "2026-06-25T10:39:39.890102+00:00"
     }
   ],
   "processed": [
@@ -54,7 +54,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-06-22T00:19:56.708438+00:00",
+    "last_run": "2026-06-25T10:39:39.890183+00:00",
     "next_scheduled": null
   }
 }
