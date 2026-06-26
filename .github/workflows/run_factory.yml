@@ -547,13 +547,36 @@ jobs:
             git push
           fi
 
-       # 6. Trigger Kaggle (Using Kaggle CLI)
+       # ====================================================================
+      # CROSS-RUN HISTORICAL ARTIFACT RECOVERY LOOP (PERMANENT FIX)
+      # ====================================================================
+
+      # 6. Search across ALL historical runs to find and download yesterday's active token state
+      - name: Download Latest Historical Kaggle Session State
+        uses: dawidd6/action-download-artifact@v9
+        continue-on-error: true # Safe fallback if the entire repo is wiped
+        with:
+          name: kaggle-rolling-state
+          search_artifacts: true  # CRITICAL: Forces GitHub to look outside the current run thread
+          path: .                 # Extract file directly to your main working workspace root
+
+
+      # 7. Trigger Kaggle (Using Kaggle CLI & Playwright)
       - name: Trigger Kaggle Notebook
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           KAGGLE_AUTH_JSON: ${{ secrets.KAGGLE_AUTH_JSON }}
         run: python3 trigger.py
+
+      # 8. Upload the freshly generated rolling session state so tomorrow's run can use it
+      - name: Save Refreshed Kaggle Session State
+        if: always() # Guarantees updated cookies register even if other pipeline steps fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: kaggle-rolling-state
+          path: state.json # Keep this as state.json since you verified that's what's inside
+          retention-days: 7
 
       # - name: Execute Kaggle T4x2 Push Trigger
       #   # 🔥 THE CRITICAL ENVIRONMENT BRIDGE:
