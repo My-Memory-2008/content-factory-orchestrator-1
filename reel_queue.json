@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/the_cinnamom/reel/DSCH7yCjwnx/",
+      "url": "https://www.instagram.com/the_cinnamom/reel/DODwzxqj5Ai/",
       "username": "the_cinnamom",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-06-26T00:30:34.101590+00:00"
+      "added_at": "2026-06-26T06:32:03.317428+00:00"
     }
   ],
   "processed": [
@@ -66,7 +66,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-06-26T00:30:34.101692+00:00",
+    "last_run": "2026-06-26T06:32:03.317526+00:00",
     "next_scheduled": null
   }
 }
