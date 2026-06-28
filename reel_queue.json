@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/silviaribeirodoceria/reel/BvR4ygpgdCF/",
-      "username": "silviaribeirodoceria",
+      "url": "https://www.instagram.com/jane___marie/reel/DVh2AC-kjeT/",
+      "username": "jane___marie",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-06-27T12:00:26.112590+00:00"
+      "added_at": "2026-06-28T00:30:24.078628+00:00"
     }
   ],
   "processed": [
@@ -108,7 +108,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-06-27T12:00:26.112684+00:00",
+    "last_run": "2026-06-28T00:30:24.078725+00:00",
     "next_scheduled": null
   }
 }
