@@ -103,6 +103,7 @@
 
 
 
+
 import asyncio
 import os
 import sys
@@ -113,13 +114,14 @@ async def run():
     async with async_playwright() as p:
         print("🚀 Setting up ultra-efficient Kaggle Script Save Version trigger...")
         
-        # 1. Fetch official API credentials from GitHub Secrets
-        KAGGLE_USER = os.environ.get("KAGGLE_USERNAME")
-        KAGGLE_KEY = os.environ.get("KAGGLE_KEY")
-        
-        if not KAGGLE_USER or not KAGGLE_KEY:
-            print("❌ Error: Missing KAGGLE_USERNAME or KAGGLE_KEY secrets!")
+        # 1. Verify and load repository secrets token blocks
+        secret_auth_data = os.environ.get("KAGGLE_AUTH_JSON")
+        if not secret_auth_data:
+            print("❌ Error: Missing KAGGLE_AUTH_JSON environment variable secret!")
             sys.exit(1)
+            
+        with open("kaggle_auth.json", "w") as f:
+            f.write(secret_auth_data)
 
         # Launching headless browser on desktop resolution
         browser = await p.chromium.launch(headless=True, args=["--window-size=1920,1080"])
@@ -130,11 +132,12 @@ async def run():
         active_page = None
 
         # ====================================================================
-        # LAYER 1: TRY ROLLING COOKIES (FAST PATH)
+        # LAYER 1: PRIORITISE ROLLING CLOUD COOKIES (FUTURE AUTOMATION PATH)
         # ====================================================================
         if os.path.exists("state.json") and os.path.getsize("state.json") > 5:
-            print("🔑 Attempting login with historical rolling state.json session cookies...")
+            print("🔑 Path Selected: Attempting login with historical rolling state.json cloud cookies...")
             try:
+                # FIXED: Corrected the viewport syntax from a comma-set to a structured key-value pair dictionary
                 historical_context = await browser.new_context(
                     storage_state="state.json",
                     viewport={"width": 1920, "height": 1080}
@@ -142,50 +145,37 @@ async def run():
                 historical_page = await historical_context.new_page()
                 await historical_page.goto(notebook_url, wait_until="domcontentloaded", timeout=45000)
                 
-                # Verify if we are actually in the editor or got booted to login page
+                # Verify if we successfully bypassed the login screen into the editor
                 await historical_page.wait_for_selector("button:has-text('Save Version'), .edit-notebook", timeout=10000)
-                print("✅ Historical rolling cookies verified! Session successfully resumed.")
+                print("✅ Success: Historical rolling cloud cookies verified! Session resumed.")
                 
                 active_context = historical_context
                 active_page = historical_page
                 login_successful = True
             except Exception as e:
-                print(f"⚠️ Historical session cookies expired or flagged by IP jump: {e}")
+                print(f"⚠️ Rolling cookies expired or not yet valid on this container branch: {e}")
                 if 'historical_page' in locals(): await historical_page.close()
                 if 'historical_context' in locals(): await historical_context.close()
                 login_successful = False
 
         # ====================================================================
-        # LAYER 2: PERMANENT FALLBACK (NATIVE KAGGLE LOGIN VIA API CREDENTIALS)
+        # LAYER 2: FIRST-TIME RUN IMPORT (USES KAGGLE_AUTH_JSON SECRET ONLY ONCE)
         # ====================================================================
         if not login_successful:
-            print("🔑 Rolling cookies failed. Executing permanent API-driven login fallback...")
+            print("🔑 Path Selected: Bootstrapping session using KAGGLE_AUTH_JSON secret token layout...")
             try:
-                original_context = await browser.new_context(viewport={"width": 1920, "height": 1080})
+                original_context = await browser.new_context(
+                    storage_state="kaggle_auth.json",
+                    viewport={"width": 1920, "height": 1080}
+                )
                 original_page = await original_context.new_page()
-                
-                # Navigate straight to Kaggle's clean login gateway
-                await original_page.goto("Use code with caution.pythonhttps://kaggle.comUse code with caution.python", wait_until="domcontentloaded")
-                
-                # Click 'Sign in with Kaggle' to reveal standard user/pass/key fields
-                await original_page.click("button:has-text('Sign in with Kaggle'), button:has-text('Email')")
-                
-                # Kaggle lets you log in using your Username and your permanent API Secret Key!
-                await original_page.fill("input[name='username'], input[type='text']", KAGGLE_USER)
-                await original_page.fill("input[name='password'], input[type='password']", KAGGLE_KEY)
-                
-                # Submit login form
-                await original_page.click("button[type='submit'], button:has-text('Sign In')")
-                await original_page.wait_for_timeout(5000)
-                
-                # Now navigate to your notebook editor completely authenticated
-                print("📡 Routing authenticated browser to editor space...")
-                await original_page.goto(notebook_url, wait_until="domcontentloaded", timeout=60000)
+                await original_page.goto(notebook_url, wait_until="domcontentloaded", timeout=90000)
                 
                 active_context = original_context
                 active_page = original_page
+                print("✅ Success: Initial login completed using repository token file framework.")
             except Exception as e:
-                print(f"❌ Core API fallback login failed: {e}")
+                print(f"❌ Core navigation failed using backup token structures: {e}")
                 sys.exit(1)
 
         # ====================================================================
@@ -253,6 +243,8 @@ async def run():
         print("🎉 PIPELINE TRIGGER COMPLETE!")
         print("="*80 + "\n")
         
+        # FIX STEP: Add a short 2-second sleep window to let loose execution loops close out cleanly
+        await asyncio.sleep(2)
         await browser.close()
 
 if __name__ == "__main__":
