@@ -405,7 +405,7 @@ async def run():
                 )
                 historical_page = await historical_context.new_page()
                 await historical_page.goto(notebook_url, wait_until="domcontentloaded", timeout=45000)
-                
+                print("kkkkkkl              inside the notebook")
                 # Verify if we are actually in the editor or got booted to login page
                 await historical_page.wait_for_selector("button:has-text('Save Version'), .edit-notebook", timeout=10000)
                 print("✅ Historical rolling cookies verified! Session successfully resumed.")
