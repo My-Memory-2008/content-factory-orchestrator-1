@@ -365,6 +365,8 @@
 
 
 
+
+
 import asyncio
 import os
 import sys
@@ -395,13 +397,13 @@ async def run():
         # ====================================================================
         # LAYER 1: PRIORITISE ROLLING CLOUD COOKIES (FUTURE AUTOMATION PATH)
         # ====================================================================
-        # If state.json exists and has data, it means a previous run already created cookies
         if os.path.exists("state.json") and os.path.getsize("state.json") > 5:
             print("🔑 Path Selected: Attempting login with historical rolling state.json cloud cookies...")
             try:
+                # FIXED: Corrected the viewport syntax from a comma-set to a structured key-value pair dictionary
                 historical_context = await browser.new_context(
                     storage_state="state.json",
-                    viewport={"width=1920", "height=1080"}
+                    viewport={"width": 1920, "height": 1080}
                 )
                 historical_page = await historical_context.new_page()
                 await historical_page.goto(notebook_url, wait_until="domcontentloaded", timeout=45000)
@@ -422,7 +424,6 @@ async def run():
         # ====================================================================
         # LAYER 2: FIRST-TIME RUN IMPORT (USES KAGGLE_AUTH_JSON SECRET ONLY ONCE)
         # ====================================================================
-        # If state.json doesn't exist yet (brand new repo), this layer fires to kickstart the system
         if not login_successful:
             print("🔑 Path Selected: Bootstrapping session using KAGGLE_AUTH_JSON secret token layout...")
             try:
@@ -505,6 +506,8 @@ async def run():
         print("🎉 PIPELINE TRIGGER COMPLETE!")
         print("="*80 + "\n")
         
+        # FIX STEP: Add a short 2-second sleep window to let loose execution loops close out cleanly
+        await asyncio.sleep(2)
         await browser.close()
 
 if __name__ == "__main__":
