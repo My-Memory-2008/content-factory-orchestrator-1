@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/silviaribeirodoceria/reel/BWNm657hwo_/",
+      "url": "https://www.instagram.com/silviaribeirodoceria/reel/B1qlMEBnFvX/",
       "username": "silviaribeirodoceria",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-06-30T10:49:29.421044+00:00"
+      "added_at": "2026-07-01T00:30:28.231204+00:00"
     }
   ],
   "processed": [
@@ -162,7 +162,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-06-30T10:49:29.421132+00:00",
+    "last_run": "2026-07-01T00:30:28.231300+00:00",
     "next_scheduled": null
   }
 }
