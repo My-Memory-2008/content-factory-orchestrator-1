@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/daily_tiffin_09/reel/DXnhHZmkcRF/",
-      "username": "daily_tiffin_09",
+      "url": "https://www.instagram.com/criminisiicecream/reel/DSTMFZJjJAa/",
+      "username": "criminisiicecream",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-07-02T12:05:04.725946+00:00"
+      "added_at": "2026-07-03T00:31:54.429486+00:00"
     }
   ],
   "processed": [
@@ -198,7 +198,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-07-02T12:05:04.726080+00:00",
+    "last_run": "2026-07-03T00:31:54.429569+00:00",
     "next_scheduled": null
   }
 }
