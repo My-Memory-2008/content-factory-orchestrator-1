@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/manija.palacinkarnica/reel/DFVkUTPsGIp/",
-      "username": "manija.palacinkarnica",
+      "url": "https://www.instagram.com/lecker__rezepte1/reel/DON6DpmiZSd/",
+      "username": "lecker__rezepte1",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-07-05T00:34:22.980216+00:00"
+      "added_at": "2026-07-05T06:30:55.426213+00:00"
     }
   ],
   "processed": [
@@ -252,7 +252,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-07-05T00:34:22.980330+00:00",
+    "last_run": "2026-07-05T06:30:55.426303+00:00",
     "next_scheduled": null
   }
 }
