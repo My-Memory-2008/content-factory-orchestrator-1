@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/daily_tiffin_09/reel/DZPzKNRN60I/",
-      "username": "daily_tiffin_09",
+      "url": "https://www.instagram.com/exploregyn/reel/C4qOoIMuz5T/",
+      "username": "exploregyn",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-07-07T12:02:28.899678+00:00"
+      "added_at": "2026-07-08T12:00:55.125661+00:00"
     }
   ],
   "processed": [
@@ -300,7 +300,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-07-07T12:02:28.899836+00:00",
+    "last_run": "2026-07-08T12:00:55.125799+00:00",
     "next_scheduled": null
   }
 }
