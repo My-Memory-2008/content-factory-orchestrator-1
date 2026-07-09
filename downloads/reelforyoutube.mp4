@@ -86,9 +86,6 @@ gtag('config', 'G-ECP5SKBQFR');
 </script>
 <script defer src="https://www.googletagmanager.com/gtag/js?id=G-ECP5SKBQFR"></script>
 
-<!-- Google AdSense -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5377059826781210" crossorigin="anonymous"></script>
-
 </head>
 <body>
 
@@ -1037,9 +1034,9 @@ function startDownload(url, clickedBtn) {
             <li><a href="/privacy-policy/" class="footer-nav-link">Privacy Policy</a></li>
             <li><a href="/terms-of-service/" class="footer-nav-link">Terms of Service</a></li>
             <li><a href="/contact/" class="footer-nav-link">Contact</a></li>
-            <li><a href="/cdn-cgi/l/email-protection#90f3fffee4f1f3e4d0f4ffe7fee2f5f5fce3bef3fffd" class="footer-nav-link">
+            <li><a href="/cdn-cgi/l/email-protection#f794989983969483b7939880998592929b84d994989a" class="footer-nav-link">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-              <span class="__cf_email__" data-cfemail="3c5f5352485d5f487c58534b524e5959504f125f5351">[email&#160;protected]</span>
+              <span class="__cf_email__" data-cfemail="ccafa3a2b8adafb88ca8a3bba2bea9a9a0bfe2afa3a1">[email&#160;protected]</span>
             </a></li>
           </ul>
         </nav>
@@ -1251,5 +1248,5 @@ function startDownload(url, clickedBtn) {
 }</script>
 
 <script src="/assets/js/app.js" defer></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a186d0854ac2eb25',t:'MTc4MzU5NDcxNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1874f134ba19167',t:'MTc4MzU5OTkwMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
