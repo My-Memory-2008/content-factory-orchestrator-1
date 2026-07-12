@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/lecker__rezepte1/reel/DR2GHrsDfAQ/",
-      "username": "lecker__rezepte1",
+      "url": "https://www.instagram.com/jane___marie/reel/DOQQ9EFE7A6/",
+      "username": "jane___marie",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-07-11T12:00:28.619196+00:00"
+      "added_at": "2026-07-12T12:03:35.219588+00:00"
     }
   ],
   "processed": [
@@ -336,7 +336,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-07-11T12:00:28.619340+00:00",
+    "last_run": "2026-07-12T12:03:35.219720+00:00",
     "next_scheduled": null
   }
 }
