@@ -1,0 +1,10 @@
+[
+  {
+    "time_ist": "17:30",
+    "workflow_file": "populate_queue.yml"
+  },
+  {
+    "time_ist": "17:52",
+    "workflow_file": "run_factory.yml"
+  }
+]
