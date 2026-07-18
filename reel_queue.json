@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/goianiaindica/reel/DKSE077g5vJ/",
-      "username": "goianiaindica",
+      "url": "https://www.instagram.com/jane___marie/reel/DUXEFrAgW6i/",
+      "username": "jane___marie",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-07-16T12:03:17.961804+00:00"
+      "added_at": "2026-07-18T12:02:53.078575+00:00"
     }
   ],
   "processed": [
@@ -360,7 +360,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-07-16T12:03:17.961937+00:00",
+    "last_run": "2026-07-18T12:02:53.078745+00:00",
     "next_scheduled": null
   }
 }
