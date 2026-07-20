@@ -276,6 +276,9 @@ import pytz
 # Setup Indian Standard Timezone
 IST = pytz.timezone('Asia/Kolkata')
 
+# Track the absolute start time of this scheduler script
+MASTER_START_TIME = time.time()
+
 def get_current_ist():
     return datetime.now(IST)
 
@@ -418,7 +421,27 @@ def check_and_execute_jobs():
 def main():
     print("🚀 Long-running master scheduler started via Python loop engine...", flush=True)
     
+    # 5.5 hours safety window to run controller before GitHub drops the machine
+    five_and_half_hours_master = 5.5 * 60 * 60 
+    
     while True:
+        # Check total runtime of the master scheduler script itself
+        elapsed_master_time = time.time() - MASTER_START_TIME
+        if elapsed_master_time >= five_and_half_hours_master:
+            print(f"\n⚠️ Alert: Master script runtime ({elapsed_master_time / 3600:.2f} hours) is approaching GitHub limits!", flush=True)
+            
+            controller_wf = "scheduler-controller.yml"
+            print(f"Triggering controller workflow: {controller_wf}...", flush=True)
+            trigger_cmd = f"gh workflow run {controller_wf} --ref main"
+            
+            t_out, t_err, t_code = run_command(trigger_cmd)
+            if t_code == 0:
+                print(f"✅ {controller_wf} triggered successfully. Terminating master script process.", flush=True)
+                sys.exit(0)
+            else:
+                print(f"❌ Failed to trigger {controller_wf}. Error: {t_err}. Aborting.", flush=True)
+                sys.exit(1)
+
         check_and_execute_jobs()
         print("Sleeping for 5 minutes...", flush=True)
         time.sleep(300)
