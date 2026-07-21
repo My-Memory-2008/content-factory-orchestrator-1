@@ -1,10 +1,10 @@
 {
   "queue": [
     {
-      "url": "https://www.instagram.com/thatfoodfeed/reel/Cd3vNKVsk8e/",
-      "username": "thatfoodfeed",
+      "url": "https://www.instagram.com/jane___marie/reel/DNM1hhrTl0L/",
+      "username": "jane___marie",
       "notes": "Auto-added from reels_source.txt",
-      "added_at": "2026-07-19T12:04:06.188519+00:00"
+      "added_at": "2026-07-21T12:02:20.844479+00:00"
     }
   ],
   "processed": [
@@ -372,7 +372,7 @@
   "metadata": {
     "total_queued": 1,
     "total_processed": 0,
-    "last_run": "2026-07-19T12:04:06.188691+00:00",
+    "last_run": "2026-07-21T12:02:20.844637+00:00",
     "next_scheduled": null
   }
 }
